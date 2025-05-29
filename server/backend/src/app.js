@@ -3,10 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const authRoutes = require('./routes/authRoutes');
+const authRoutes    = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
-const taskRoutes = require('./routes/taskRoutes');
-const errorHandler = require('./middlewares/errorHandler');
+const taskRoutes    = require('./routes/taskRoutes');
+const reportRoutes  = require('./routes/reportRoutes');   // ← add this
+const errorHandler  = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -34,9 +35,10 @@ app.get('/', (req, res) => {
 });
 
 // API routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth',    authRoutes);
 app.use('/api/students', studentRoutes);
-app.use('/api/tasks', taskRoutes);
+app.use('/api/tasks',    taskRoutes);
+app.use('/api/reports',  reportRoutes);   // ← and this
 
 // Global error handler
 app.use(errorHandler);

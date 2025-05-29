@@ -2,7 +2,6 @@
 const supabase = require('../config/supabaseClient');
 
 async function login(email, password) {
-  // Query your users table directly
   const { data, error } = await supabase
     .from('users')
     .select('id, name, email, role')
@@ -10,14 +9,19 @@ async function login(email, password) {
     .eq('password_hash', password)
     .single();
 
-  if (error || !data) {
-    const err = new Error('Invalid login credentials');
-    err.status = 401;
-    throw err;
-  }
-
-  // For simplicity, just return the user record
-  return data;
+  return error || !data ? null : data;
 }
 
-module.exports = { login };
+async function loginStudent(email, password) {
+  const user = await login(email, password);
+  if (!user || user.role !== 'student') return null;
+  return user;
+}
+
+async function loginTeacher(email, password) {
+  const user = await login(email, password);
+  if (!user || user.role !== 'teacher') return null;
+  return user;
+}
+
+module.exports = { loginStudent, loginTeacher };

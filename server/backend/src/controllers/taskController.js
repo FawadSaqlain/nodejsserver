@@ -1,41 +1,67 @@
-// src/controllers/taskController.js
-const taskService = require('../services/taskService');
+// backend/src/controllers/taskController.js
+const supabase = require('../config/supabaseClient');
 
 async function list(req, res, next) {
   try {
-    console.log('[Controller.list] Fetching all tasks');
-    const tasks = await taskService.getTasks();
-    console.log('[Controller.list] Retrieved tasks:', tasks);
-    res.json(tasks);
+    const { userId, role } = req.body;
+
+    let query = supabase
+      .from('tasks')
+      .select('id, title, description, due_date, status, assigned_to, users(name)')
+      .order('due_date', { ascending: true });
+
+    if (role === 'student') {
+      query = query.eq('assigned_to', userId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const enriched = data.map(task => ({
+      ...task,
+      assigned_to_name: task.users?.name ?? 'Unknown',
+    }));
+
+    res.json(enriched);
   } catch (err) {
-    console.error('[Controller.list] Error:', err);
     next(err);
   }
 }
 
 async function create(req, res, next) {
   try {
-    console.log('[Controller.create] Incoming request body:', req.body);
-    const task = await taskService.createTask(req.body);
-    console.log('[Controller.create] Service returned new task:', task);
-    res.status(201).json(task);
+    const { title, description, assigned_to, due_date } = req.body;
+    const { data, error } = await supabase.from('tasks').insert([{
+      title,
+      description,
+      assigned_to,
+      due_date,
+      status: 'pending',
+    }]);
+
+    if (error) throw error;
+
+    res.status(201).json({ success: true });
   } catch (err) {
-    console.error('[Controller.create] Error:', err);
     next(err);
   }
 }
+
 async function update(req, res, next) {
   try {
     const { id, status } = req.body;
-    if (typeof id !== 'number' || typeof status !== 'string') {
-      return res.status(400).json({ message: 'id (number) and status (string) required' });
-    }
-    const updated = await taskService.updateTaskStatus(id, status);
-    res.json(updated);
+    const { error } = await supabase
+      .from('tasks')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.status(200).json({ success: true });
   } catch (err) {
     next(err);
   }
 }
 
 module.exports = { list, create, update };
-// module.exports = { list, create };

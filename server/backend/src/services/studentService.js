@@ -57,6 +57,8 @@ async function updateStudent(id, { name, email, password }) {
   return data[0];
 }
 
+
+
 module.exports = {
   getStudents,
   createStudent,

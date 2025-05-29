@@ -1,15 +1,34 @@
 // backend/src/controllers/authController.js
 const authService = require('../services/authService');
 
-async function login(req, res, next) {
+async function studentLogin(req, res, next) {
   try {
     const { email, password } = req.body;
-    console.log('Email is : ', email, 'Password is : ', password);  // <-- fixed typo here
-    const user = await authService.login(email, password);
-    res.json({ user });
+    const user = await authService.loginStudent(email, password);
+
+    if (!user) {
+      return res.status(401).json({ auth: false });
+    }
+
+    return res.status(200).json({ auth: true, user });
   } catch (err) {
     next(err);
   }
 }
 
-module.exports = { login };
+async function teacherLogin(req, res, next) {
+  try {
+    const { email, password } = req.body;
+    const user = await authService.loginTeacher(email, password);
+
+    if (!user) {
+      return res.status(401).json({ auth: false });
+    }
+
+    return res.status(200).json({ auth: true, user });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { studentLogin, teacherLogin };

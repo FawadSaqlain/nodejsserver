@@ -1,8 +1,8 @@
-// src/routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
-router.post('/login', authController.login);
+router.post('/student', authController.studentLogin);
+router.post('/teacher', authController.teacherLogin);
 
 module.exports = router;
