@@ -1,6 +1,7 @@
+// backend\src\server.js
+// backend/src/server.js
 const app = require('./app');
-const { PORT } = require('./config/config');
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+module.exports = (req, res) => {
+  app(req, res);
+};
