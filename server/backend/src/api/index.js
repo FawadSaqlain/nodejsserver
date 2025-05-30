@@ -1,7 +1,7 @@
-// backend\src\api\index.js
-const server = require('../server');
+// src/api/index.js
+const app = require('../app');
 
-// Export as Vercel function
 module.exports = (req, res) => {
-  server(req, res);
+  // Let Vercel handle listen(), just pass in req & res
+  app(req, res);
 };
